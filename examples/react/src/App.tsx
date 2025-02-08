@@ -1,53 +1,55 @@
-import React, { useState } from "react";
+import { useEffect } from "react";
 import { useStore } from "@yoki/react";
-import { todoStore, addTodo, toggleTodo, removeTodo } from "./store";
+import { ProductList } from "./components/ProductList";
+import { Cart } from "./components/Cart";
+import { UserProfile } from "./components/UserProfile";
+import { productsStore, fetchProducts } from "./store/product";
+import { cartStore, toggleCart } from "./store/cart";
+import { userStore, login } from "./store/user";
 import "./App.css";
+import { countStore } from "./store/count";
 
 export default function App() {
-  const { todos } = useStore(todoStore);
-  const [input, setInput] = useState("");
+  const { isAuthenticated } = useStore(userStore);
+  const { items: cartItems } = useStore(cartStore);
+  const { loading } = useStore(productsStore);
+  const { count, increase, initCount } = useStore(countStore);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (input.trim()) {
-      addTodo(input.trim());
-      setInput("");
-    }
-  };
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  console.info(111, count);
 
   return (
-    <div className="container">
-      <h1>Todo List</h1>
+    <div className={`app ${userStore.getState().preferences.theme}`}>
+      <span>count: {count}</span>
+      <span onClick={increase}>Add</span>
+      {/* <header>
+        <div className="header-right">
+          {isAuthenticated ? (
+            <>
+              <button onClick={toggleCart}>
+                Open Cart ({cartItems.length})
+              </button>
+              <UserProfile />
+            </>
+          ) : (
+            <button onClick={() => login("xd1Sg@example.com")}>Login</button>
+          )}
+        </div>
+      </header>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="What needs to be done?"
-        />
-        <button type="submit">Add Todo</button>
-      </form>
-
-      <ul>
-        {todos.map((todo) => (
-          <li key={todo.id}>
-            <input
-              type="checkbox"
-              checked={todo.completed}
-              onChange={() => toggleTodo(todo.id)}
-            />
-            <span
-              style={{
-                textDecoration: todo.completed ? "line-through" : "none",
-              }}
-            >
-              {todo.text}
-            </span>
-            <button onClick={() => removeTodo(todo.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
+      <main>
+        {loading ? (
+          <div>Loading...</div>
+        ) : (
+          <>
+            <ProductList />
+            <Cart />
+          </>
+        )}
+      </main> */}
     </div>
   );
 }
